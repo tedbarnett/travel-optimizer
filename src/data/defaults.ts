@@ -1,0 +1,48 @@
+import type { Preferences } from '../types';
+
+export const PREFERENCES_VERSION = 1;
+
+export const defaultPreferences: Preferences = {
+  version: PREFERENCES_VERSION,
+  homeAirport: 'EWR',
+  alternateAirports: [
+    { code: 'JFK', dollarPenalty: 100, timePenaltyMinutes: 120 },
+  ],
+  airlines: [
+    { code: 'UA', tier: 'preferred' },
+    { code: 'LH', tier: 'preferred' },
+    { code: 'NH', tier: 'preferred' },
+    { code: 'AC', tier: 'preferred' },
+    { code: 'SQ', tier: 'preferred' },
+    { code: 'SK', tier: 'preferred' },
+    { code: 'AA', tier: 'acceptable' },
+    { code: 'BA', tier: 'acceptable' },
+    { code: 'JL', tier: 'acceptable' },
+    { code: 'QF', tier: 'acceptable' },
+    { code: 'CX', tier: 'acceptable' },
+    { code: 'AS', tier: 'acceptable' },
+    { code: 'NK', tier: 'avoid' },
+    { code: 'F9', tier: 'avoid' },
+  ],
+  preferredAlliances: ['Star Alliance'],
+  avoidAirlinePenalty: 150,
+  acceptableAirlinePenalty: 50,
+  nonPreferredAirlinePenalty: 75,
+  preferredCabin: 'business',
+  businessIfOvernight: true,
+  overnightEconomyPenalty: 200,
+  seatPreference: 'window',
+  nonstopBonus: -50,
+  perStopPenalty: 75,
+  perLayoverHourPenalty: 25,
+  layoverThresholdMinutes: 60,
+  preferredAircraft: ['A350', 'A380', 'B787'],
+  aircraftBonus: -75,
+  nonPreferredAircraftPenalty: 0,
+  earlyDeparturePenalty: 100,
+  earlyDepartureThreshold: 7,
+  lateDeparturePenalty: 50,
+  lateDepartureThreshold: 22,
+  dollarPerHour: 50,
+  maxBudget: null,
+};
