@@ -2,6 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Getting Started (New Users / Claude Cowork)
+
+If you've just cloned this repo, run these commands to get a local version of the site running:
+
+```bash
+npm install
+npm run dev
+```
+
+This starts a local dev server at **http://localhost:5173** — no accounts, API keys, or cloud services needed. The app uses mock flight data and stores all preferences/feedback in the browser's localStorage.
+
+After making changes, the dev server hot-reloads automatically. To verify everything works:
+
+```bash
+npm run test      # Run the 21 unit tests
+npm run build     # Verify the production build compiles cleanly
+```
+
+Cloudflare deployment is optional and requires separate authentication (`wrangler login`). For local development and testing, `npm run dev` is all you need.
+
 ## Project Status
 
 V1 MVP — functional with mock flight data. Deployed to Cloudflare Pages.
