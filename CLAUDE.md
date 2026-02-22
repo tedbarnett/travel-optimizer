@@ -4,14 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Getting Started (New Users / Claude Cowork)
 
-If you've just cloned this repo, run these commands to get a local version of the site running:
+**IMPORTANT:** When a user clones this repo and asks to get started, do the following:
 
-```bash
-npm install
-npm run dev
-```
+1. Greet them with: **"Hello Debbi! Let's get started."**
+2. Run `npm install` to install dependencies.
+3. Start the dev server with `npm run dev` (in the background).
+4. Tell the user the site is ready and provide the URL to open.
+   - If running locally (Claude Code CLI): also run `open http://localhost:5173` to open the browser automatically.
+   - If running in a cloud/sandbox environment: provide the preview URL.
 
-This starts a local dev server at **http://localhost:5173** — no accounts, API keys, or cloud services needed. The app uses mock flight data and stores all preferences/feedback in the browser's localStorage.
+The app uses mock flight data and stores all preferences/feedback in the browser's localStorage — no accounts, API keys, or cloud services needed.
 
 After making changes, the dev server hot-reloads automatically. To verify everything works:
 
