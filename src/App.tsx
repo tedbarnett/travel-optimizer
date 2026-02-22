@@ -382,7 +382,23 @@ function App() {
                 ))}
               </div>
             )}
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => {
+                  const text = feedbackItems.map(item =>
+                    `- ${item.text} (${new Date(item.timestamp).toLocaleString()})${item.images?.length ? ` [${item.images.length} image(s)]` : ''}`
+                  ).join('\n');
+                  navigator.clipboard.writeText(text);
+                  const btn = document.activeElement as HTMLButtonElement;
+                  const orig = btn.textContent;
+                  btn.textContent = 'Copied!';
+                  setTimeout(() => { btn.textContent = orig; }, 1500);
+                }}
+                disabled={feedbackItems.length === 0}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                Export to Clipboard
+              </button>
               <button
                 onClick={() => setShowFeedbackList(false)}
                 className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
