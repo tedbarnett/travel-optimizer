@@ -19,7 +19,31 @@ type FeedbackItem = {
   id: string;
   text: string;
   timestamp: string;
+  images?: string[]; // base64 data URLs
 };
+
+function resizeImage(file: File, maxSize: number): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = e.target!.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 function loadFeedback(): FeedbackItem[] {
   try {
@@ -46,7 +70,10 @@ function App() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showFeedbackList, setShowFeedbackList] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackImages, setFeedbackImages] = useState<string[]>([]);
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>(loadFeedback);
+  const feedbackFileRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
 
   const handleSearch = (params: SearchParams) => {
     setSearchParams(params);
@@ -237,6 +264,56 @@ function App() {
               rows={5}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
             />
+
+            {/* Image drop zone / file picker */}
+            <div
+              onDragOver={e => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={async e => {
+                e.preventDefault();
+                setDragging(false);
+                const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                const resized = await Promise.all(files.map(f => resizeImage(f, 800)));
+                setFeedbackImages(prev => [...prev, ...resized]);
+              }}
+              onClick={() => feedbackFileRef.current?.click()}
+              className={`mt-3 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+                dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              <p className="text-sm text-gray-500">Drop images here or click to attach</p>
+              <input
+                ref={feedbackFileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={async e => {
+                  const files = Array.from(e.target.files || []);
+                  const resized = await Promise.all(files.map(f => resizeImage(f, 800)));
+                  setFeedbackImages(prev => [...prev, ...resized]);
+                  e.target.value = '';
+                }}
+              />
+            </div>
+
+            {/* Image previews */}
+            {feedbackImages.length > 0 && (
+              <div className="mt-3 flex gap-2 flex-wrap">
+                {feedbackImages.map((img, i) => (
+                  <div key={i} className="relative group">
+                    <img src={img} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                    <button
+                      onClick={() => setFeedbackImages(prev => prev.filter((_, j) => j !== i))}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="mt-4 flex items-center justify-between">
               <button
                 onClick={() => { setShowFeedback(false); setShowFeedbackList(true); }}
@@ -246,27 +323,29 @@ function App() {
               </button>
               <div className="flex gap-2">
                 <button
-                  onClick={() => { setFeedbackText(''); setShowFeedback(false); }}
+                  onClick={() => { setFeedbackText(''); setFeedbackImages([]); setShowFeedback(false); }}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => {
-                    if (feedbackText.trim()) {
+                    if (feedbackText.trim() || feedbackImages.length > 0) {
                       const item: FeedbackItem = {
                         id: Date.now().toString(),
                         text: feedbackText.trim(),
                         timestamp: new Date().toISOString(),
+                        images: feedbackImages.length > 0 ? feedbackImages : undefined,
                       };
                       const updated = [item, ...feedbackItems];
                       setFeedbackItems(updated);
                       saveFeedback(updated);
                     }
                     setFeedbackText('');
+                    setFeedbackImages([]);
                     setShowFeedback(false);
                   }}
-                  disabled={!feedbackText.trim()}
+                  disabled={!feedbackText.trim() && feedbackImages.length === 0}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   Save
@@ -289,6 +368,13 @@ function App() {
                 {feedbackItems.map(item => (
                   <div key={item.id} className="border border-gray-200 rounded-lg p-3">
                     <p className="text-sm text-gray-700 whitespace-pre-wrap">{item.text}</p>
+                    {item.images && item.images.length > 0 && (
+                      <div className="mt-2 flex gap-2 flex-wrap">
+                        {item.images.map((img, i) => (
+                          <img key={i} src={img} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                        ))}
+                      </div>
+                    )}
                     <p className="text-xs text-gray-400 mt-2">
                       {new Date(item.timestamp).toLocaleString()}
                     </p>
