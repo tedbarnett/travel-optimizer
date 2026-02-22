@@ -98,7 +98,7 @@ npm run preview   # Preview production build locally
 ## Deployment
 
 ```bash
-npm run build && wrangler pages deploy dist --project-name=travel-optimizer
+npm run build && wrangler pages deploy dist --project-name=travel-optimizer --branch=main
 ```
 
 ## UI Notes
