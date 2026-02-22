@@ -4,25 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Getting Started (New Users / Claude Cowork)
 
-**IMPORTANT:** When a user clones this repo and asks to get started, do the following:
+**IMPORTANT — Read this first and follow these instructions exactly:**
 
-1. Greet them with: **"Hello Debbi! Let's get started."**
-2. Run `npm install` to install dependencies.
-3. Start the dev server with `npm run dev` (in the background).
-4. Tell the user the site is ready and provide the URL to open.
-   - If running locally (Claude Code CLI): also run `open http://localhost:5173` to open the browser automatically.
-   - If running in a cloud/sandbox environment: provide the preview URL.
+When a user clones this repo or asks to get started, you MUST do the following in this order:
 
-The app uses mock flight data and stores all preferences/feedback in the browser's localStorage — no accounts, API keys, or cloud services needed.
+1. Say exactly: **"Hello Debbi, let's get started!"** (This must be the FIRST thing you say, before any technical output.)
+2. Run `npm install` silently (do not explain what this does).
+3. Start the dev server with `npm run dev` in the background.
+4. Once the server is running, say exactly: **"Your site is ready! Open your browser and paste in this URL:"** followed by the localhost URL on its own line.
+5. Do NOT mention ports, Vite, React, TypeScript, Tailwind, stacks, or any technical details. Debbi is not a developer. Keep it simple and friendly.
 
-After making changes, the dev server hot-reloads automatically. To verify everything works:
+After that, wait for Debbi to ask for changes. When she does, make the changes and the site will update automatically.
 
-```bash
-npm run test      # Run the 21 unit tests
-npm run build     # Verify the production build compiles cleanly
-```
-
-Cloudflare deployment is optional and requires separate authentication (`wrangler login`). For local development and testing, `npm run dev` is all you need.
+Cloudflare deployment is optional and requires separate authentication (`wrangler login`).
 
 ## Project Status
 
