@@ -21,9 +21,11 @@ const penaltyLabels: Record<PenaltyCategory, string> = {
   jetLag: 'Jet Lag',
 };
 
-function formatTime(dateStr: string): string {
+function formatTime(dateStr: string, timezone?: string): string {
   const d = new Date(dateStr);
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const opts: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+  if (timezone) opts.timeZone = timezone;
+  return d.toLocaleTimeString('en-US', opts);
 }
 
 function formatDuration(minutes: number): string {
@@ -76,12 +78,12 @@ export default function FlightCard({ scored, preferences, rank }: Props) {
               <span className="font-mono">
                 {getAirport(flight.departureAirport)?.code || flight.departureAirport}
               </span>
-              <span className="text-gray-900 font-medium">{formatTime(flight.departureTime)}</span>
+              <span className="text-gray-900 font-medium">{formatTime(flight.departureTime, getAirport(flight.departureAirport)?.timezone)}</span>
               <span className="text-gray-400">→</span>
               <span className="font-mono">
                 {getAirport(flight.arrivalAirport)?.code || flight.arrivalAirport}
               </span>
-              <span className="text-gray-900 font-medium">{formatTime(flight.arrivalTime)}</span>
+              <span className="text-gray-900 font-medium">{formatTime(flight.arrivalTime, getAirport(flight.arrivalAirport)?.timezone)}</span>
               <span className="text-gray-500 ml-1">{formatDuration(flight.totalDurationMinutes)}</span>
               <span className="text-gray-500">
                 {flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
@@ -137,7 +139,7 @@ export default function FlightCard({ scored, preferences, rank }: Props) {
                     <span className="font-mono text-xs">{seg.flightNumber}</span>
                     <span>{segAirline?.name}</span>
                     <span className="text-gray-400">|</span>
-                    <span>{seg.departureAirport} {formatTime(seg.departureTime)} → {seg.arrivalAirport} {formatTime(seg.arrivalTime)}</span>
+                    <span>{seg.departureAirport} {formatTime(seg.departureTime, getAirport(seg.departureAirport)?.timezone)} → {seg.arrivalAirport} {formatTime(seg.arrivalTime, getAirport(seg.arrivalAirport)?.timezone)}</span>
                     <span className="text-gray-400">|</span>
                     <span>{segAcft?.name}</span>
                     <span className="capitalize text-gray-500">{seg.cabinClass.replace('_', ' ')}</span>
